@@ -27,11 +27,19 @@ def runAStar():
     return False
 
 i = 0
+corrupted = []
 while True:
     line = f.readline().strip()
+    if line == "":
+        break
     l, r = re.search(r"(\d+),(\d+)", line).group(1, 2)
     l, r = int(l), int(r)
+    corrupted.append((l, r))
     grid[l][r] = "#"
-    if not runAStar():
-        print(l, r)
+
+for i in range(len(corrupted)-1, -1, -1):
+    x, y = corrupted[i]
+    grid[x][y] = "."
+    if runAStar():
+        print(corrupted[i])
         break
