@@ -35,11 +35,24 @@ while True:
     l, r = re.search(r"(\d+),(\d+)", line).group(1, 2)
     l, r = int(l), int(r)
     corrupted.append((l, r))
-    grid[l][r] = "#"
 
-for i in range(len(corrupted)-1, -1, -1):
-    x, y = corrupted[i]
-    grid[x][y] = "."
+l, r = 0, len(corrupted) - 1
+firstByte = len(corrupted) - 1
+while l <= r:
+    m = (l+r)//2
+    for i in range(m+1):
+        j, k = corrupted[i]
+        grid[j][k] = "#"
+
     if runAStar():
-        print(corrupted[i])
-        break
+        l = m + 1
+    else:
+        firstByte = m
+        r = m - 1
+
+    for i in range(m+1):
+        j, k = corrupted[i]
+        grid[j][k] = "."
+
+
+print(corrupted[firstByte])
