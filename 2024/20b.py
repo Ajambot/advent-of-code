@@ -21,11 +21,11 @@ dirs = [(0, 1), (1,0), (-1, 0), (0, -1)]
 
 cur = end
 steps = 0
-path = []
+path = {}
 while True:
     i, o = cur
     grid[i][o] = "O"
-    path.append((i, o, steps))
+    path[(i, o)] = steps
     steps += 1
     if cur == start:
         break
@@ -34,15 +34,24 @@ while True:
             cur = (i+l, o+r)
 
 res = 0
-save ={}
-for i in range(len(path)):
-    for o in range(i+1, len(path)):
-        x1, y1, s1 = path[i]
-        x2, y2, s2 = path[o]
-        if s2 > s1:
-            x1, y1, s1, x2, y2, s2 = x2, y2, s2, x1, y1, s1
-        dist = abs(x1-x2) + abs(y1-y2)
-        if dist <= 20 and s1-s2-dist >= 100:
-            res += 1
-            save[s1-s2-dist] = save.get(s1-s2-dist, 0) + 1
+for coord in path:
+    x, y = coord
+    dist = path[coord]
+    for i in range(21):
+        for o in range(21):
+            if i == 0 and o == 0:
+                continue
+            if i+o > 20:
+                continue
+            if (x+i, y+o) in path and dist - path[(x+i, y+o)] - (i+o) >= 100:
+                res += 1
+
+            if i and (x-i, y+o) in path and dist - path[(x-i, y+o)] - (i+o) >= 100:
+                res += 1
+
+            if o and (x+i, y-o) in path and dist - path[(x+i, y-o)] - (i+o) >= 100:
+                res += 1
+
+            if i and o and (x-i, y-o) in path and dist - path[(x-i, y-o)] - (i+o) >= 100:
+                res += 1
 print(res)
