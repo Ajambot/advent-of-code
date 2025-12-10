@@ -1,23 +1,25 @@
-import math
+import sys
 
-def parseLights(lightsTxt):
-    lightsExpected = ""
+sys.setrecursionlimit(5000)
+
+def parseLights(lightsTxt, length):
+    lightsExpected = 0
     for c in lightsTxt:
         if c in "[]":
             continue
-        lightsExpected += "1" if c == "#" else "0"
+        if c == "#":
+            lightsExpected |= 1<<(length-1)
+        length -= 1
     return lightsExpected
 
-def parseButtons(buttonsTxt):
+def parseButtons(buttonsTxt, length):
     buttons = []
     for bt in buttonsTxt:
-        mask = "".join(["0" for _ in range(lightAmount)])
+        mask = 0
         bt = bt[1:-1]
         for p in bt.split(','):
-            p = int(p)
-            mask = mask[:p] + "1" + mask[p+1:]
-            mask = int(mask)
-            buttons.append(mask)
+            mask |= 1<<(length-int(p)-1)
+        buttons.append(mask)
     return buttons
 
 lightsExpected = 0
@@ -25,24 +27,31 @@ buttons = []
 mem = {}
 
 def dp(cur, pressed):
-    if mem[cur] <= len(pressed):
+    if cur in mem and len(mem[cur]) <= len(pressed):
         return
-    mem[cur] = len(pressed)
+    mem[cur] = pressed
     if cur == lightsExpected:
         return
     for i in range(len(buttons)):
-        dp()
+        dp(cur ^ buttons[i], pressed + [i])
 
 with open('10test.txt') as f:
+    res = 0
     for line in f:
+        mem = {}
         line = line.strip()
         lightsTxt = line.split(' ')[0]
         buttonsTxt = line.split(' ')[1:-1]
-        lightsExpected = parseLights(lightsTxt)
+        lightAmount = len(lightsTxt)-2
+        lightsExpected = parseLights(lightsTxt, lightAmount)
 
-        lightAmount = len(lightsExpected)
         lightsExpected = int(lightsExpected)
 
-        buttons = parseButtons(buttonsTxt)
-
-
+        buttons = parseButtons(buttonsTxt, lightAmount)
+        # print("Expected: ", bin(lightsExpected))
+        # for bt in buttons:
+        #     print(bin(bt))
+        dp(0, [])
+        print(len(mem[lightsExpected]), mem[lightsExpected])
+        res += len(mem[lightsExpected])
+    print(res)
