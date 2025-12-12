@@ -35,7 +35,7 @@ def dp(cur, pressed):
     for i in range(len(buttons)):
         dp(cur ^ buttons[i], pressed + [i])
 
-with open('10test.txt') as f:
+with open('10.txt') as f:
     res = 0
     for line in f:
         mem = {}
@@ -48,10 +48,6 @@ with open('10test.txt') as f:
         lightsExpected = int(lightsExpected)
 
         buttons = parseButtons(buttonsTxt, lightAmount)
-        # print("Expected: ", bin(lightsExpected))
-        # for bt in buttons:
-        #     print(bin(bt))
         dp(0, [])
-        print(len(mem[lightsExpected]), mem[lightsExpected])
         res += len(mem[lightsExpected])
     print(res)
